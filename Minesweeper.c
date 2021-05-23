@@ -55,7 +55,7 @@ int main() {
     fclose (p);
 	
 	attron(COLOR_PAIR(4));
-	wborder(win, '*','*','*','*','*','*','*','*');
+	wborder(win, '*','*','*','*','*','*','*','*'); //Doesn't show bottom border
 	attroff(COLOR_PAIR(4));
 	wrefresh(win);
 
