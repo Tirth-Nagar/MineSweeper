@@ -68,19 +68,19 @@ int menuSetup(void){
 	wrefresh(opt);
 	
 	char *options1[4] = {"New game", "Settings", "About", "Quit"};
-	
+	int charNum[4] = {8,8,5,4};
 	int choice, highlight = 0;
 	
 	while(1){
-		for(int i =0; i<4;i++){
+		for(int i=0; i<4;i++){
 			if(i==highlight){
 				wattron(opt,A_REVERSE);
 				wattron(opt,COLOR_PAIR(1));
 			}
-			mvwprintw(opt,width/2+i, (height/2)-4, "%s", options1[i]);
+			mvwprintw(opt,width/2+i, (height- charNum[i])/2, "%s", options1[i]);
+			wrefresh(opt);
 			wattroff(opt,COLOR_PAIR(1));
 			wattroff(opt,A_REVERSE);
-			
 		}
 		choice = wgetch(opt);
 		
@@ -161,6 +161,7 @@ int main() {
 	initscr();
 	noecho();
 	cbreak();
+	curs_set(0);
 	
 	mainSetup();
 	menuSetup();
