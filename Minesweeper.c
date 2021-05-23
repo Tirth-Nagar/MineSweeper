@@ -35,9 +35,8 @@ int main() {
 	
 	int width,height = terminalSize();
 	
-	int start_x = 0,start_y = 0;
 	
-	WINDOW * win = newwin(height,width,start_y,start_x);
+	WINDOW * win = newwin(height,width,0,0);
 	refresh();
 	
 	FILE *p = fopen ("logo.txt" , "r");;
