@@ -37,9 +37,6 @@ int main() {
 	
 	int start_x = 0,start_y = 0;
 	
-	char msg[]="This is My Box";		
-	int row,col;
-	
 	WINDOW * win = newwin(height,width,start_y,start_x);
 	refresh();
 	
@@ -51,10 +48,10 @@ int main() {
 		mvprintw(i++, COLS / 2 - 50, "%s", str);
 		wrefresh(win);
 	}
-	attron(A_STANDOUT);
-	wborder(win, ' ',' ',' ',' ',' ',' ',' ',' ');
-	attroff(A_STANDOUT);
-	wrefresh(win);
+	//attron(A_STANDOUT);
+	//wborder(win, ' ',' ',' ',' ',' ',' ',' ',' ');
+	//attroff(A_STANDOUT);
+	//wrefresh(win);
     fclose (p);
 	
 	attron(COLOR_PAIR(4));
