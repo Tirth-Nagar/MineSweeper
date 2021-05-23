@@ -4,12 +4,7 @@
 #include <string.h>
 #include <curses.h>
 
-int main() {
-	
-	initscr();
-	refresh();
-	cbreak();
-	
+int menuSetup(void){
 	int start_y=0,start_x=0;
 	
 	start_color();
@@ -45,11 +40,65 @@ int main() {
 	WINDOW * opt = newwin(height-start_y,width,start_y,start_x);
 	refresh();
 	
+	keypad(opt,true);
+	
 	box(opt,0,0);
 	
 	wrefresh(opt);
+	
+	char *options1[4] = {"New game", "Settings", "About", "Quit"};
+	
+	int choice, highlight = 0;
+	
+	while(1){
+		for(int i =0; i<4;i++){
+			if(i==highlight){
+				wattron(opt,A_REVERSE);
+			}
+			mvwprintw(opt,i+1, 1, options1[i]);
+			wattroff(opt,A_REVERSE);
+			
+		}
+		choice = wgetch(opt);
+		
+		switch(choice){
+			case KEY_UP:
+				highlight--;
+				break;
+			case KEY_DOWN:
+				highlight++;
+				break;
+			default:
+				break;
+		}
+		
+		if(choice==10){
+			break;
+			
+			
+		}
+		
+		
+		
+		
+	}
+	
+	
+	
+	return 0;
+}
 
-	getch();
+
+
+int main() {
+	
+	initscr();
+	noecho();
+	cbreak();
+	
+	menuSetup();
+	
+
 	getch();
 	
 	endwin();
