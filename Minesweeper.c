@@ -107,6 +107,10 @@ int menuSetup(void){
 	}
 	
 	wclear(opt);
+	refresh();
+	
+	box(opt,0,0);
+	wrefresh(opt);
 	
 	if(highlight==0){
 		NULL; //New Game
@@ -117,7 +121,28 @@ int menuSetup(void){
 	}
 	
 	else if(highlight==2){
-		NULL; //About
+		wattron(opt,A_UNDERLINE);
+		mvwprintw(opt,width/2, (height-38)/2,"Hello welcome to the minesweeper clone");
+		mvwprintw(opt,width/2+1, (height-36)/2,"made by Tirth Nagar using the Curses");
+		mvwprintw(opt,width/2+2, (height-40)/2,"Library the rules are the same as normal");
+		mvwprintw(opt,width/2+3, (height-27)/2,"Minesweeper so Go Have Fun!"); //About
+		wattroff(opt,A_UNDERLINE);
+		
+		wattron(opt,A_STANDOUT);
+		mvwprintw(opt,width/2+5,(height-22)/2," Press 'X' To Go Back ");
+		wattroff(opt,A_STANDOUT);
+		wrefresh(opt);
+		
+		char ch;
+		while(ch!='X'||ch!='x'){ 
+			ch = getch();
+			
+			if(ch == 'x' || ch == 'X'){
+				wclear(stdscr);
+				mainSetup();
+				menuSetup();
+			}
+		}
 	}
 	
 	else if(highlight==3){
