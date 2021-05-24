@@ -131,7 +131,7 @@ int menuSetup(void)
 	else if (highlight == 1) //Settings
 	{
 		char *settings[3] = {"Number of Rows", "Number of Columns", "Number of Mines"};
-		int charNum[3] = {strlen(settings[0]), strlen(settings[1]), strlen(settings[2])};
+		int charNum[3] = {strlen(settings[0]) + 2, strlen(settings[1]) + 2, strlen(settings[2]) + 2};
 		choice = 0, highlight = 0;
 
 		while (1)
@@ -172,13 +172,10 @@ int menuSetup(void)
 
 			if (choice == 10)
 			{
-				while (1)
-				{
-					
-				}
 			}
 		}
 	}
+
 	else if (highlight == 2) //About
 	{
 		wattron(opt, A_UNDERLINE);
