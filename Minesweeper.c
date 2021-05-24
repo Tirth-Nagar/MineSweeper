@@ -123,9 +123,9 @@ int menuSetup(void)
 	box(opt, 0, 0);
 	wrefresh(opt);
 
-	if (highlight == 0)
+	if (highlight == 0) //New Game
 	{
-		NULL; //New Game
+		NULL; 
 	}
 
 	else if (highlight == 1) //Settings
@@ -183,7 +183,7 @@ int menuSetup(void)
 			if (choice == 10)
 			{
 				int number = 0;
-				mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: ", settings[highlight]);
+				mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]-3) / 2, "%s: ", settings[highlight]);
 				wrefresh(opt);
 				wscanw(opt, "%i", &number);
 				if (highlight == 0 || highlight == 1)
@@ -191,7 +191,7 @@ int menuSetup(void)
 					if (number > 9 && number <= 30)
 					{
 						gameInfo[highlight] = number;
-						mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: %i", settings[highlight], gameInfo[highlight]);
+						mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]-3) / 2, "%s: %i", settings[highlight], gameInfo[highlight]);
 						wrefresh(opt);
 					}
 					else
@@ -204,7 +204,7 @@ int menuSetup(void)
 					if (number <= ((gameInfo[0] * gameInfo[1]) - 1))
 					{
 						gameInfo[highlight] = number;
-						mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: %i", settings[highlight], gameInfo[highlight]);
+						mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]-3) / 2, "%s: %i", settings[highlight], gameInfo[highlight]);
 						wrefresh(opt);
 					}
 				}
@@ -256,6 +256,9 @@ int menuSetup(void)
 	}
 	return 0;
 }
+
+
+
 int main()
 {
 
