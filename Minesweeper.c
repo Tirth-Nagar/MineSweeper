@@ -3,23 +3,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <curses.h>
-#include "mines.h"
-
-
-// (x, y)-based access to game cells:
-#define cell_xy(X, Y) (game.cells[(X) + (Y) * game.nx])
-
-
-/* Global program state */
-
-Board board;
-Game game;
-
-size_t cursorX;
-size_t cursorY;
-
-WINDOW *boardWindow = NULL;
-WINDOW *headerWindow = NULL;
 
 int gameInfo[3] = {9, 9, 10};
 
@@ -59,8 +42,6 @@ int mainSetup(void)
 
 	return 0;
 }
-
-int playGame();
 
 int menuSetup(void)
 {
@@ -142,9 +123,9 @@ int menuSetup(void)
 	box(opt, 0, 0);
 	wrefresh(opt);
 
-	if (highlight == 0)//Play Game
+	if (highlight == 0)
 	{
-		playGame();
+		NULL; //New Game
 	}
 
 	else if (highlight == 1) //Settings
@@ -275,246 +256,16 @@ int menuSetup(void)
 	}
 	return 0;
 }
-
-int playGame(){
-
-	void move_cursor_left(bool skipping) {
-    while (cursorX > 0) {
-        cursorX--;
-        // When skipping, find the next non-0 cell in the direction:
-        if (!skipping || cell_xy(cursorX, cursorY) != STATUS_ZERO) break;
-    }
-}
-
-void move_cursor_right(bool skipping) {
-    while (cursorX < game.nx - 1) {
-        cursorX++;
-        if (!skipping || cell_xy(cursorX, cursorY) != STATUS_ZERO) break;
-    }
-}
-
-void move_cursor_up(bool skipping) {
-    while (cursorY > 0) {
-        cursorY--;
-        if (!skipping || cell_xy(cursorX, cursorY) != STATUS_ZERO) break;
-    }
-}
-
-void move_cursor_down(bool skipping) {
-    while (cursorY < game.ny - 1) {
-        cursorY++;
-        if (!skipping || cell_xy(cursorX, cursorY) != STATUS_ZERO) break;
-    }
-}
-
-
-// An extended action (uncover all non-flagged adjacent cells) is available for
-// cells with 1-8 markers:
-bool extended_action_available() {
-    const Status status = cell_xy(cursorX, cursorY);
-    return status > STATUS_ZERO && status != STATUS_MINE;
-}
-
-
-
-/* Interface */
-
-void draw_layout() {
-    // Clean up old windows:
-    if (boardWindow != NULL) delwin(boardWindow);
-    if (headerWindow != NULL) delwin(headerWindow);
-    wclear(stdscr);
-    // Determine available screen size:
-    int termW, termH;
-    getmaxyx(stdscr, termH, termW);
-    // Determine required screen size:
-    const int boardW = (int) (4*game.nx + 1);
-    const int boardH = (int) (2*game.ny + 1);
-    const int headerH = 3;
-    // Terminal is not big enough to contain board. Display a message
-    // containing the required size:
-    if (termH < boardH + headerH || termW < boardW) {
-        wattrset(stdscr, A_BOLD);
-        mvwprintw(stdscr, 0, 0, "required terminal size: %d x %d\n"
-                                "available terminal size: %d x %d", boardW, boardH + headerH, termW, termH);
-        boardWindow = NULL;
-        headerWindow = NULL;
-    // Create (centered) windows for the header and game board:
-    } else {
-        const int offsetX = (termW - boardW) / 2;
-        const int offsetY = (termH - boardH - headerH) / 2;
-        boardWindow = newwin(boardH, boardW, offsetY + headerH, offsetX);
-        headerWindow = newwin(headerH, boardW, offsetY, offsetX);
-    }
-    // Fill the background:
-    wbkgd(stdscr, COLOR_PAIR(1));
-    wrefresh(stdscr);
-    // Board and header have to be refreshed separately
-}
-
-void draw_board() {
-    if (boardWindow == NULL) return;
-    werase(boardWindow);
-    for (size_t y = 0; y < game.ny; y++) {
-        // Every second row in y-direction
-        const size_t screenY = 1 + 2*y;
-        for (size_t x = 0; x < game.nx; x++) {
-            // Every fourth row in x-direction
-            const size_t screenX = 2 + 4*x;
-            Status cellStatus = cell_xy(x, y);
-            // Output symbol:
-            chtype ch;
-            switch (cellStatus) {
-                case STATUS_UNKNOWN:
-                    ch = ACS_BULLET;
-                    break;
-                case STATUS_MINE:
-                    ch = '#';
-                    break;
-                case STATUS_FLAG:
-                    ch = 'X';
-                    break;
-                case STATUS_ZERO:
-                    ch = ' ';
-                    break;
-                case STATUS_ONE:
-                    ch = '1';
-                    break;
-                case STATUS_TWO:
-                    ch = '2';
-                    break;
-                case STATUS_THREE:
-                    ch = '3';
-                    break;
-                case STATUS_FOUR:
-                    ch = '4';
-                    break;
-                case STATUS_FIVE:
-                    ch = '5';
-                    break;
-                case STATUS_SIX:
-                    ch = '6';
-                    break;
-                case STATUS_SEVEN:
-                    ch = '7';
-                    break;
-                case STATUS_EIGHT:
-                    ch = '8';
-                    break;
-            }
-            // Apply style depending on cell status:
-            wattrset(boardWindow, COLOR_PAIR(10 + cellStatus));
-            mvwaddch(boardWindow, screenY, screenX, ch);
-        }
-    }
-    // Screen position of cursor:
-    const size_t x = 2 + 4*cursorX;
-    const size_t y = 1 + 2*cursorY;
-    // Draw inner cursor:
-    wattrset(boardWindow, COLOR_PAIR(20));
-    mvwaddch(boardWindow, y + 1, x + 2, ACS_LRCORNER);
-    mvwaddch(boardWindow, y + 1, x - 2, ACS_LLCORNER);
-    mvwaddch(boardWindow, y - 1, x + 2, ACS_URCORNER);
-    mvwaddch(boardWindow, y - 1, x - 2, ACS_ULCORNER);
-    // Draw outer (3x3) cursor only if the extended action is available:
-    if (extended_action_available()) {
-        wattrset(boardWindow, COLOR_PAIR(21));
-        if (cursorX < game.nx - 1 && cursorY < game.ny - 1) mvwaddch(boardWindow, y + 3, x + 6, ACS_LRCORNER);
-        if (cursorX > 0 && cursorY < game.ny - 1) mvwaddch(boardWindow, y + 3, x - 6, ACS_LLCORNER);
-        if (cursorX < game.nx - 1 && cursorY > 0) mvwaddch(boardWindow, y - 3, x + 6, ACS_URCORNER);
-        if (cursorX > 0 && cursorY > 0) mvwaddch(boardWindow, y - 3, x - 6, ACS_ULCORNER);
-    }
-    // Apply changes:
-    wrefresh(boardWindow);
-}
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
 int main()
 {
+
 	initscr();
 	noecho();
 	cbreak();
 	curs_set(0);
 
 	mainSetup();
-	
 	menuSetup();
-
-	// Initialize interface:
-    draw_layout();
-
-	while (true) {
-        // Update game board:
-        draw_board();
-        // Obtain user input:
-        const int key = getch();
-        // Exit program on q or ^D
-        if (key == 'q' || key == ('d' & 0x1F)) break;
-        // Actions
-        switch (key) {
-            case 'k':
-            case 'K':
-            case KEY_UP:
-                move_cursor_up(key == 'K');
-                break;
-            case 'j':
-            case 'J':
-            case KEY_DOWN:
-                move_cursor_down(key == 'J');
-                break;
-            case 'h':
-            case 'H':
-            case KEY_LEFT:
-                move_cursor_left(key == 'H');
-                break;
-            case 'l':
-            case 'L':
-            case KEY_RIGHT:
-                move_cursor_right(key == 'L');
-                break;
-            case 'f':
-            case 'm':
-                toggle_flag(&game, cursorX, cursorY);
-                break;
-            case ' ':
-                // The first move is always safe
-                if (game.nopen == game.nx * game.ny) {
-                    make_safe(&board, cursorX, cursorY);
-                }
-                // Normal or extended action?
-                if (extended_action_available()) {
-                    uncover_adjacent(&game, cursorX, cursorY);
-                } else {
-                    uncover(&game, cursorX, cursorY);
-                }
-                break;
-        }
-        
-        // Game has ended:
-        if (game.state != UNDECIDED) {
-            draw_board();
-            draw_header();
-            getch(); // any key to quit
-            break;
-        }
-
-    }
 
 	getch();
 
