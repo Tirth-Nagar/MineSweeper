@@ -148,6 +148,12 @@ int menuSetup(void)
 				wattroff(opt, COLOR_PAIR(1));
 				wattroff(opt, A_REVERSE);
 			}
+
+			wattron(opt, A_STANDOUT);
+			mvwprintw(opt, rows / 2 + 5, (cols - 22) / 2, " Press 'X' To Go Back ");
+			wattroff(opt, A_STANDOUT);
+			wrefresh(opt);
+
 			choice = wgetch(opt);
 
 			switch (choice)
@@ -166,12 +172,48 @@ int menuSetup(void)
 					highlight = 0;
 				}
 				break;
+			case 'x':
+				wclear(stdscr);
+				mainSetup();
+				menuSetup();
 			default:
 				break;
 			}
 
 			if (choice == 10)
 			{
+				int number = 0;
+				mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: ", settings[highlight]);
+				wrefresh(opt);
+				wscanw(opt, "%i", &number);
+				if (highlight == 0 || highlight == 1)
+				{
+					if (number > 9 && number <= 30)
+					{
+						gameInfo[highlight] = number;
+						mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: %i", settings[highlight], gameInfo[highlight]);
+						wrefresh(opt);
+					}
+					else
+					{
+						continue;
+					}
+				}
+				if (highlight == 2)
+				{
+					if (number <= ((gameInfo[0] * gameInfo[1]) - 1))
+					{
+						gameInfo[highlight] = number;
+						mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: %i", settings[highlight], gameInfo[highlight]);
+						wrefresh(opt);
+					}
+				}
+				if (number == 'x' || number == 'X')
+				{
+					wclear(stdscr);
+					mainSetup();
+					menuSetup();
+				}
 			}
 		}
 	}
