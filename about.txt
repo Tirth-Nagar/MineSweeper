@@ -1,4 +1,0 @@
-	Hello welcome to the minesweeper clone
-	made by Tirth Nagar using the Curses
-	Library the rules are the same as normal
-	Minesweeper so Go Have Fun!
