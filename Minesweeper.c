@@ -393,14 +393,14 @@ int playGame()
 	initColorPairs();
 
 	attron(A_STANDOUT);
-	mvprintw(rows / 2 + 15, (cols - 22) / 2 , " Press 'X' To Go Back ");
+	mvprintw((W * STEP_X + 1)-4, (cols - 22) / 2 , " Press 'X' To Go Back ");
 	attroff(A_STANDOUT);
 	wrefresh(board_win);
 
 	printBoard(physicalH, physicalW);
 
 	updateInfo();
-	mvprintw(rows / 2 + 12, (cols-45) /2 ,control);
+	mvprintw((W * STEP_X + 1)-6, (cols-45) /2 ,control);
 
 	wmove(board_win, 1, 2);
 	X = 0;
@@ -843,7 +843,7 @@ void printInfo()
 	int rows,cols;
 	getmaxyx(stdscr, rows, cols);
 
-	move(rows / 2 + 8, (cols-40) /2);
+	move((W * STEP_X + 1)-8, (cols-40) /2);
 	clrtoeol();
 	printw(info);
 	touchwin(stdscr);
