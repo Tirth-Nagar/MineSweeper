@@ -1,4 +1,3 @@
-// Terminal Size 138x41 highly recommended
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,7 +65,7 @@ int main()
 
 	endwin();
 
-	getch();
+	// getch();
 	return 0;
 }
 
@@ -370,7 +369,7 @@ int playGame()
 	int rows, cols;
 
 	getmaxyx(stdscr, rows, cols);
-
+	
 	H = gameInfo[0];
 	W = gameInfo[1];
 	N = gameInfo[2];
@@ -392,10 +391,15 @@ int playGame()
 
 	initColorPairs();
 
+	attron(A_STANDOUT);
+	mvprintw(rows / 2 + 12, (cols - 22) / 2 , " Press 'X' To Go Back ");
+	attroff(A_STANDOUT);
+	wrefresh(board_win);
+
 	printBoard(physicalH, physicalW);
 
 	updateInfo();
-	mvprintw((H + 8) * STEP_Y, W * 5 + 1, control);
+	mvprintw(rows / 2 + 8, (cols-45) /2 ,control);
 
 	wmove(board_win, 1, 2);
 	X = 0;
@@ -647,6 +651,11 @@ void initKeypad()
 		case 'F':
 			flagMine(board_win);
 			break;
+		case 'x':
+		case 'X':
+			wclear(stdscr);
+			mainSetup();
+			menuSetup();
 		case ' ':
 			testMine(board_win);
 			break;
@@ -829,8 +838,11 @@ void addChar(int y, int x, chtype c)
 }
 
 void printInfo()
-{
-	move((H + 5) * STEP_Y, W * 5.5 - 1);
+{	
+	int rows,cols;
+	getmaxyx(stdscr, rows, cols);
+
+	move(rows / 2 + 5, (cols-45) /2);
 	clrtoeol();
 	printw(info);
 	touchwin(stdscr);
@@ -969,32 +981,5 @@ void initColorPairs()
 		init_pair(10, COLOR_WHITE, -1);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // End OF Code
