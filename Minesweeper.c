@@ -89,6 +89,7 @@ int mainSetup(void)
 
 	WINDOW *win = newwin(rows, cols, start_y, start_x);
 	refresh();
+	wrefresh(win);
 
 	FILE *p = fopen("logo.txt", "r");
 	char str[200];
@@ -249,6 +250,7 @@ int menuSetup(void)
 			if (choice == 10)
 			{
 				int number = 0;
+
 				mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: ", settings[highlight]);
 				wrefresh(opt);
 				wscanw(opt, "%i", &number);
@@ -257,6 +259,26 @@ int menuSetup(void)
 					if (number >= 9 && number <= 30)
 					{
 						gameInfo[highlight] = number;
+						wclear(opt);
+						refresh();
+
+						box(opt, 0, 0);
+						wrefresh(opt);
+						for (int i = 0; i < 3; i++)
+						{
+							if (i == highlight)
+							{
+								wattron(opt, A_REVERSE);
+								wattron(opt, COLOR_PAIR(1));
+							}
+							mvwprintw(opt, rows / 2 + i, (cols - charNum[i]) / 2, "%s: %i", settings[i], gameInfo[i]);
+							wrefresh(opt);
+							wattroff(opt, COLOR_PAIR(1));
+							wattroff(opt, A_REVERSE);
+						}
+						wattron(opt, A_STANDOUT);
+						mvwprintw(opt, rows / 2 + 5, (cols - 22) / 2, " Press 'X' To Go Back ");
+						wattroff(opt, A_STANDOUT);
 						wrefresh(opt);
 					}
 					else
@@ -269,6 +291,26 @@ int menuSetup(void)
 					if (number <= ((gameInfo[0] * gameInfo[1]) - 1) && number > 0)
 					{
 						gameInfo[highlight] = number;
+						wclear(opt);
+						refresh();
+
+						box(opt, 0, 0);
+						wrefresh(opt);
+						for (int i = 0; i < 3; i++)
+						{
+							if (i == highlight)
+							{
+								wattron(opt, A_REVERSE);
+								wattron(opt, COLOR_PAIR(1));
+							}
+							mvwprintw(opt, rows / 2 + i, (cols - charNum[i]) / 2, "%s: %i", settings[i], gameInfo[i]);
+							wrefresh(opt);
+							wattroff(opt, COLOR_PAIR(1));
+							wattroff(opt, A_REVERSE);
+						}
+						wattron(opt, A_STANDOUT);
+						mvwprintw(opt, rows / 2 + 5, (cols - 22) / 2, " Press 'X' To Go Back ");
+						wattroff(opt, A_STANDOUT);
 						wrefresh(opt);
 					}
 				}
@@ -349,13 +391,6 @@ int playGame()
 	board_win = subwin(stdscr, physicalH, physicalW, 8, cols / 2.75);
 
 	initColorPairs();
-
-	if (board_win == NULL)
-	{
-		fprintf(stderr, "Can't create subwindow. Try a smaller map or scale the terminal.\n");
-		resetTerminal();
-		return 1;
-	}
 
 	printBoard(physicalH, physicalW);
 
@@ -934,3 +969,32 @@ void initColorPairs()
 		init_pair(10, COLOR_WHITE, -1);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// End OF Code
