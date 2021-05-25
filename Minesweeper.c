@@ -1,3 +1,4 @@
+//Terminal Size 138x41 is reccommed for 9x9
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -392,14 +393,14 @@ int playGame()
 	initColorPairs();
 
 	attron(A_STANDOUT);
-	mvprintw(rows / 2 + 12, (cols - 22) / 2 , " Press 'X' To Go Back ");
+	mvprintw(rows / 2 + 15, (cols - 22) / 2 , " Press 'X' To Go Back ");
 	attroff(A_STANDOUT);
 	wrefresh(board_win);
 
 	printBoard(physicalH, physicalW);
 
 	updateInfo();
-	mvprintw(rows / 2 + 8, (cols-45) /2 ,control);
+	mvprintw(rows / 2 + 12, (cols-45) /2 ,control);
 
 	wmove(board_win, 1, 2);
 	X = 0;
@@ -842,7 +843,7 @@ void printInfo()
 	int rows,cols;
 	getmaxyx(stdscr, rows, cols);
 
-	move(rows / 2 + 5, (cols-45) /2);
+	move(rows / 2 + 8, (cols-40) /2);
 	clrtoeol();
 	printw(info);
 	touchwin(stdscr);
