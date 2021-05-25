@@ -940,7 +940,7 @@ void gameWin()
 	GAME_END_PRESS = 1;
 
 	// Inform the player
-	sprintf(info, "Congrats! You survived the minefield!");
+	sprintf(info, "Congrats! You survived the minefield POG");
 	printInfo();
 
 	touchwin(stdscr);
@@ -954,7 +954,7 @@ void gameOver()
 	GAME_END_PRESS = 1;
 
 	// Inform the player
-	sprintf(info, "You triggered a mine! Better luck next time!");
+	sprintf(info, " You hit a mine! Better luck next time! ");
 	printInfo();
 
 	touchwin(stdscr);
