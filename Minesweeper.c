@@ -8,13 +8,13 @@
 #include <errno.h>
 #include <time.h>
 
-#define DEFAULT_W 10
-#define DEFAULT_H 10
+// Define Macros for Constant values to be used throughout the code
+#define DEFAULT_WIDTH 9
+#define DEFAULT_HEIGHT 9
 #define CW 5
 #define CH 3
 #define DEFAULT_MINE 10
 #define DEFAULT_C 10
-
 #define MINE '*'
 #define FLAG 'F'
 #define ZERO '0'
@@ -22,6 +22,7 @@
 #define VALUE_MASK 0x3f
 #define FLAG_MASK 0x40
 
+// Create Function Prototypes
 void printBoard(int physicalH, int physicalW);
 void initGame();
 void resetTerminal();
@@ -35,24 +36,28 @@ void gameOver();
 void addChar(int y, int x, chtype c);
 void printInfo();
 void updateInfo();
-void redrawScreen();
 void initColorPairs();
 int mainSetup();
 int menuSetup();
 int playGame();
-static int W = DEFAULT_W, H = DEFAULT_H, N = DEFAULT_MINE;
-static int X = 0, Y = 0, STEP_X = CW - 1, STEP_Y = CH - 1;
-static WINDOW *board_win;
-static unsigned char *board_arry;
-static unsigned char *temp_arry;
-static unsigned int tempSize;
-static char *info;
-static char *infoFormat = "There is %d mines remaining on the field"; //Cheat here -> Correct: %d";
-static char *control = "MOVE: [AWDS or arrows] PROBE: [SPACE] FLAG: F ";
-static int REMAIN_N = 0, CORRECT_N = 0, GAME_END_PRESS = 0;
-static bool GAME_END = false, COL_SUPP = false;
-int gameInfo[3] = {9, 9, 10};
 
+// Create Global Variables to be used throughout the program
+int W = DEFAULT_WIDTH, H = DEFAULT_HEIGHT, N = DEFAULT_MINE;
+int X = 0, Y = 0, STEP_X = CW - 1, STEP_Y = CH - 1;
+WINDOW *board_win;
+unsigned char *board_arry;
+unsigned char *temp_arry;
+unsigned int tempSize;
+char *info;
+char *infoFormat = "There is %d mines remaining on the field"; 
+char *control = "MOVE: [AWDS or arrows] PROBE: [SPACE] FLAG: F ";
+int REMAIN_N = 0, CORRECT_N = 0, GAME_END_PRESS = 0;
+bool GAME_END = false, COL_SUPP = false;
+
+// Array for user inputted settings
+int gameInfo[3] = {DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_MINE};
+
+// Main Function
 int main()
 {
 
@@ -64,25 +69,16 @@ int main()
 	mainSetup();
 	menuSetup();
 
-	endwin();
-
-	// getch();
 	return 0;
 }
 
+// Create the logo header
 int mainSetup(void)
 {
 
 	int start_y = 0, start_x = 0;
 
-	start_color();
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);
-	init_pair(2, COLOR_RED, COLOR_BLACK);
-	init_pair(3, COLOR_MAGENTA, COLOR_BLACK);
-	init_pair(4, COLOR_CYAN, COLOR_BLACK);
-	init_pair(5, COLOR_BLACK, COLOR_YELLOW);
-	init_pair(6, COLOR_WHITE, COLOR_BLACK);
-	init_pair(7, COLOR_RED, COLOR_WHITE);
+	initColorPairs();
 
 	int cols = 0, rows = 0;
 	getmaxyx(stdscr, rows, cols);
@@ -108,17 +104,11 @@ int mainSetup(void)
 	return 0;
 }
 
+// Setup the menu and all the functions
 int menuSetup(void)
 {
 
-	start_color();
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);
-	init_pair(2, COLOR_RED, COLOR_BLACK);
-	init_pair(3, COLOR_MAGENTA, COLOR_BLACK);
-	init_pair(4, COLOR_CYAN, COLOR_BLACK);
-	init_pair(5, COLOR_BLACK, COLOR_YELLOW);
-	init_pair(6, COLOR_WHITE, COLOR_BLACK);
-	init_pair(7, COLOR_RED, COLOR_WHITE);
+	initColorPairs();
 
 	int cols = 0, rows = 0;
 	getmaxyx(stdscr, rows, cols);
@@ -363,6 +353,7 @@ int menuSetup(void)
 	return 0;
 }
 
+// Setup and play the game
 int playGame()
 {
 	mainSetup();
@@ -370,7 +361,7 @@ int playGame()
 	int rows, cols;
 
 	getmaxyx(stdscr, rows, cols);
-	
+
 	H = gameInfo[0];
 	W = gameInfo[1];
 	N = gameInfo[2];
@@ -393,14 +384,14 @@ int playGame()
 	initColorPairs();
 
 	attron(A_STANDOUT);
-	mvprintw((W * STEP_X + 1)-4, (cols - 22) / 2 , " Press 'X' To Go Back ");
+	mvprintw((W * STEP_X + 1) - 4, (cols - 22) / 2, " Press 'X' To Go Back ");
 	attroff(A_STANDOUT);
 	wrefresh(board_win);
 
 	printBoard(physicalH, physicalW);
 
 	updateInfo();
-	mvprintw((W * STEP_X + 1)-6, (cols-45) /2 ,control);
+	mvprintw((W * STEP_X + 1) - 6, (cols - 45) / 2, control);
 
 	wmove(board_win, 1, 2);
 	X = 0;
@@ -421,6 +412,7 @@ int playGame()
 	exit(EXIT_SUCCESS);
 }
 
+// Reset the terminal
 void resetTerminal()
 {
 	delwin(board_win);
@@ -430,6 +422,7 @@ void resetTerminal()
 	exit(EXIT_FAILURE);
 }
 
+// Print the game board
 void printBoard(int physicalH, int physicalW)
 {
 	int i, j, k;
@@ -538,6 +531,7 @@ void printBoard(int physicalH, int physicalW)
 	}
 }
 
+// Initialize the hame
 void initGame()
 {
 	// Initialize to character 0
@@ -606,6 +600,7 @@ void initGame()
 	}
 }
 
+// Initialize the game controls
 void initKeypad()
 {
 	// Initailize keypad
@@ -675,6 +670,7 @@ void initKeypad()
 	echo();
 }
 
+// Test for mines at a certain point on the game board
 bool testMine()
 {
 	int idx = Y * W + X;
@@ -833,23 +829,26 @@ bool showSquare(int currY, int currX)
 	return false;
 }
 
+// Add mask to cover mines
 void addChar(int y, int x, chtype c)
 {
 	mvwaddch(board_win, y * STEP_Y + 1, x * STEP_X + 2, c);
 }
 
+// Print game related info
 void printInfo()
-{	
-	int rows,cols;
+{
+	int rows, cols;
 	getmaxyx(stdscr, rows, cols);
 
-	move((W * STEP_X + 1)-8, (cols-40) /2);
+	move((W * STEP_X + 1) - 8, (cols - 40) / 2);
 	clrtoeol();
 	printw(info);
 	touchwin(stdscr);
 	refresh();
 }
 
+// Flag/Mark the locations of the mines  
 void flagMine()
 {
 	int tempIdx = Y * W + X;
@@ -896,12 +895,14 @@ void flagMine()
 	}
 }
 
+// Update game related info
 void updateInfo()
 {
 	sprintf(info, infoFormat, REMAIN_N, CORRECT_N);
 	printInfo();
 }
 
+// Reveal the locations of all the mines
 void showAll()
 {
 	for (int i = 0; i < W * H; i++)
@@ -933,34 +934,42 @@ void showAll()
 		wattrset(board_win, COLOR_PAIR(DEFAULT_C));
 }
 
+// When user wins game do this
 void gameWin()
 {
 	showAll();
 	GAME_END = true;
 	GAME_END_PRESS = 1;
 
-	// Inform the player
+	// Inform the player they won
 	sprintf(info, "Congrats! You survived the minefield POG");
 	printInfo();
 
-	touchwin(stdscr);
-	refresh();
+	sleep(3);
+	GAME_END = false;
+	GAME_END_PRESS = 0;
+	main();
 }
 
+// When user loses do this
 void gameOver()
 {
 	showAll();
 	GAME_END = true;
 	GAME_END_PRESS = 1;
 
-	// Inform the player
+	// Inform the player they lost
 	sprintf(info, " You hit a mine! Better luck next time! ");
 	printInfo();
 
-	touchwin(stdscr);
-	refresh();
+	sleep(3);
+	GAME_END = false;
+	GAME_END_PRESS = 0;
+	main();
+	
 }
 
+// initialize color pairs
 void initColorPairs()
 {
 	// If terminal supports color
