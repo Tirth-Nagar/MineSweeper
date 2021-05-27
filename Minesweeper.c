@@ -123,9 +123,9 @@ int menuSetup(void)
 	int cols = 0, rows = 0;
 	getmaxyx(stdscr, rows, cols); // Figure out the size of the terminal in rows and columns
 
-	int start_y = 8;
+	int start_y = 8, start_x = 0;
 
-	WINDOW *opt = newwin(rows - start_y, cols, start_y, X); // Create a window the same size as the terminal in width subtracting the amount of lines the logo takes
+	WINDOW *opt = newwin(rows - start_y, cols, start_y, start_x); // Create a window the same size as the terminal in width subtracting the amount of lines the logo takes
 	refresh();
 
 	keypad(opt, true); // Initialize keypad
@@ -426,6 +426,7 @@ int playGame()
 	free(info);
 	free(board_arry);
 	free(temp_arry);
+	exit(EXIT_SUCCESS);
 }
 
 // Reset the terminal
