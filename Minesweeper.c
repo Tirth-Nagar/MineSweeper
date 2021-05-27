@@ -1,3 +1,15 @@
+/****************************************************************************************/
+/*																						*/
+/* Author: Tirth Nagar 																	*/
+/* Program Name: MineSweeper 														    */
+/* Description: This program is a game where I cloned the infamous minesweeper game		*/
+/* in which you can move around wiht WASD or arrow keys and flag mines and navigate		*/
+/* through the minefield the program is recursive and you can increase or decrease the  */
+/* difficulty through the settings. Enjoy!                                  			*/
+/* Date: Thursday May 27, 2021															*/
+/* 																						*/
+/****************************************************************************************/
+
 //Terminal Size 138x41 is reccommed for 9x9
 
 #include <stdio.h>
@@ -14,7 +26,7 @@
 #define CW 5
 #define CH 3
 #define DEFAULT_MINE 10
-#define DEFAULT_C 10
+#define DEFAULT_C 6
 #define MINE '*'
 #define FLAG 'F'
 #define ZERO '0'
@@ -49,7 +61,7 @@ unsigned char *board_arry;
 unsigned char *temp_arry;
 unsigned int tempSize;
 char *info;
-char *infoFormat = "There is %d mines remaining on the field"; 
+char *infoFormat = "There is %d mines remaining on the field";
 char *control = "MOVE: [AWDS or arrows] PROBE: [SPACE] FLAG: F ";
 int REMAIN_N = 0, CORRECT_N = 0, GAME_END_PRESS = 0;
 bool GAME_END = false, COL_SUPP = false;
@@ -61,33 +73,31 @@ int gameInfo[3] = {DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_MINE};
 int main()
 {
 
-	initscr();
-	noecho();
-	cbreak();
-	curs_set(0);
+	initscr();	 // Initialize Curses
+	noecho();	 // No displaying typed values
+	cbreak();	 // Don’t wait for return key for input
+	curs_set(0); // Do not display blinking cursor
 
-	mainSetup();
-	menuSetup();
+	mainSetup(); // Execute the mainSetup(); function
+	menuSetup(); // Execute the menuSetup(); function
 
-	return 0;
+	return 0; // Before terminating program return 0
 }
 
 // Create the logo header
 int mainSetup(void)
 {
 
-	int start_y = 0, start_x = 0;
-
-	initColorPairs();
+	initColorPairs(); // Execute the initColorPairs(); function
 
 	int cols = 0, rows = 0;
-	getmaxyx(stdscr, rows, cols);
+	getmaxyx(stdscr, rows, cols); // Figure out the size of the terminal in rows and columns
 
-	WINDOW *win = newwin(rows, cols, start_y, start_x);
+	WINDOW *win = newwin(rows, cols, Y, X); // Create a window the same size as the terminal
 	refresh();
 	wrefresh(win);
 
-	FILE *p = fopen("logo.txt", "r");
+	FILE *p = fopen("logo.txt", "r"); // Open the logo file which contains the ASCII Minesweeper logo and print it
 	char str[200];
 	int i = 1;
 
@@ -108,31 +118,31 @@ int mainSetup(void)
 int menuSetup(void)
 {
 
-	initColorPairs();
+	initColorPairs(); // Execute the initColorPairs(); function
 
 	int cols = 0, rows = 0;
-	getmaxyx(stdscr, rows, cols);
+	getmaxyx(stdscr, rows, cols); // Figure out the size of the terminal in rows and columns
 
-	int start_y = 8, start_x = 0;
+	int start_y = 8;
 
-	WINDOW *opt = newwin(rows - start_y, cols, start_y, start_x);
+	WINDOW *opt = newwin(rows - start_y, cols, start_y, X); // Create a window the same size as the terminal in width subtracting the amount of lines the logo takes
 	refresh();
 
-	keypad(opt, true);
+	keypad(opt, true); // Initialize keypad
 
-	getmaxyx(opt, rows, cols);
+	getmaxyx(opt, rows, cols); // Figure out the size of the terminal in rows and columns
 
-	box(opt, 0, 0);
+	box(opt, 0, 0); // Draw a box/border around the  opt window
 
 	wrefresh(opt);
 
-	char *options1[4] = {"New game", "Settings", "About", "Quit"};
-	int charNum[4] = {strlen(options1[0]), strlen(options1[1]), strlen(options1[2]), strlen(options1[3])};
+	char *options1[4] = {"New game", "Settings", "About", "Quit"};										   // Create an array to store options
+	int charNum[4] = {strlen(options1[0]), strlen(options1[1]), strlen(options1[2]), strlen(options1[3])}; // Create an array to store the length of each option
 	int choice = 0, highlight = 0;
 
 	while (1)
 	{
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) // Print all the options
 		{
 			if (i == highlight)
 			{
@@ -144,7 +154,8 @@ int menuSetup(void)
 			wattroff(opt, COLOR_PAIR(1));
 			wattroff(opt, A_REVERSE);
 		}
-		choice = wgetch(opt);
+
+		choice = wgetch(opt); // Initialize controls for the settings menu
 
 		switch (choice)
 		{
@@ -172,28 +183,27 @@ int menuSetup(void)
 		}
 	}
 
-	wclear(opt);
+	wclear(opt); // Clear the opt window
 	refresh();
 
-	box(opt, 0, 0);
+	box(opt, 0, 0); // Redraw the box/border around the opt window
 	wrefresh(opt);
 
-	if (highlight == 0) //New Game
+	if (highlight == 0) // If New Game option selected do this
 	{
-		curs_set(1);
-		echo();
+		curs_set(1); // Show cursor
 		playGame();
 	}
 
-	else if (highlight == 1) //Settings
+	else if (highlight == 1) // If Settings option selcted do this
 	{
-		char *settings[3] = {"Number of Rows", "Number of Columns", "Number of Mines"};
-		int charNum[3] = {strlen(settings[0]) + 2, strlen(settings[1]) + 2, strlen(settings[2]) + 2};
+		char *settings[3] = {"Number of Rows", "Number of Columns", "Number of Mines"};				  // Create an array to store options
+		int charNum[3] = {strlen(settings[0]) + 2, strlen(settings[1]) + 2, strlen(settings[2]) + 2}; // Create an array to store the length of each option + 2 chars for the numbers
 		choice = 0, highlight = 0;
 
 		while (1)
 		{
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++) // Print all the options
 			{
 				if (i == highlight)
 				{
@@ -206,14 +216,14 @@ int menuSetup(void)
 				wattroff(opt, A_REVERSE);
 			}
 
-			wattron(opt, A_STANDOUT);
+			wattron(opt, A_STANDOUT); // Print footer/ bottom header to inform the user that this is also a valid option
 			mvwprintw(opt, rows / 2 + 5, (cols - 22) / 2, " Press 'X' To Go Back ");
 			wattroff(opt, A_STANDOUT);
 			wrefresh(opt);
 
 			choice = wgetch(opt);
 
-			switch (choice)
+			switch (choice) // Initialize controls for the settings menu
 			{
 			case KEY_UP:
 				highlight--;
@@ -237,24 +247,27 @@ int menuSetup(void)
 				break;
 			}
 
-			if (choice == 10)
+			if (choice == 10) // If the enter key is pressed once selected an option do this
 			{
 				int number = 0;
 
-				mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: ", settings[highlight]);
+				mvwprintw(opt, rows / 2 + highlight, (cols - charNum[highlight]) / 2, "%s: ", settings[highlight]); // Print option selected without the number
 				wrefresh(opt);
-				wscanw(opt, "%i", &number);
-				if (highlight == 0 || highlight == 1)
+				wscanw(opt, "%i", &number); // Get user to input the number
+
+				if (highlight == 0 || highlight == 1) // If option one or two is selected 
 				{
-					if (number >= 9 && number <= 30)
+					if (number >= 9 && number <= 30)  // Ensure that the number entered is between 9 and 30 and do this
 					{
-						gameInfo[highlight] = number;
-						wclear(opt);
+						gameInfo[highlight] = number; // Set the option values to the number entered
+						
+						wclear(opt); // Clear opt window
 						refresh();
 
-						box(opt, 0, 0);
+						box(opt, 0, 0); // Create box/border around opt window
 						wrefresh(opt);
-						for (int i = 0; i < 3; i++)
+
+						for (int i = 0; i < 3; i++) // Print all the options again with the inputted number
 						{
 							if (i == highlight)
 							{
@@ -266,7 +279,8 @@ int menuSetup(void)
 							wattroff(opt, COLOR_PAIR(1));
 							wattroff(opt, A_REVERSE);
 						}
-						wattron(opt, A_STANDOUT);
+
+						wattron(opt, A_STANDOUT); // Print footer/ bottom header to inform the user that this is also a valid option
 						mvwprintw(opt, rows / 2 + 5, (cols - 22) / 2, " Press 'X' To Go Back ");
 						wattroff(opt, A_STANDOUT);
 						wrefresh(opt);
@@ -276,17 +290,19 @@ int menuSetup(void)
 						continue;
 					}
 				}
-				if (highlight == 2)
+				if (highlight == 2) // If option three is selected do this
 				{
-					if (number <= ((gameInfo[0] * gameInfo[1]) - 1) && number > 0)
+					if (number <= ((gameInfo[0] * gameInfo[1]) - 1) && number > 0) // Ensure the number entered is between 0 and 1 less than the area of the grid
 					{
 						gameInfo[highlight] = number;
-						wclear(opt);
+						
+						wclear(opt); // Clear opt window
 						refresh();
 
-						box(opt, 0, 0);
+						box(opt, 0, 0); // Create box/border around opt window
 						wrefresh(opt);
-						for (int i = 0; i < 3; i++)
+
+						for (int i = 0; i < 3; i++) // Print all the options again with the inputted number
 						{
 							if (i == highlight)
 							{
@@ -298,13 +314,13 @@ int menuSetup(void)
 							wattroff(opt, COLOR_PAIR(1));
 							wattroff(opt, A_REVERSE);
 						}
-						wattron(opt, A_STANDOUT);
+						wattron(opt, A_STANDOUT); // Print footer/ bottom header to inform the user that this is also a valid option
 						mvwprintw(opt, rows / 2 + 5, (cols - 22) / 2, " Press 'X' To Go Back ");
 						wattroff(opt, A_STANDOUT);
 						wrefresh(opt);
 					}
 				}
-				if (number == 'x' || number == 'X')
+				if (number == 'x' || number == 'X') // If X is pressed go back to main menu
 				{
 					wclear(stdscr);
 					mainSetup();
@@ -314,9 +330,9 @@ int menuSetup(void)
 		}
 	}
 
-	else if (highlight == 2) //About
+	else if (highlight == 2) // If About option is selected do this:
 	{
-		wattron(opt, A_UNDERLINE);
+		wattron(opt, A_UNDERLINE); 
 		mvwprintw(opt, rows / 2, (cols - 38) / 2, "Hello welcome to the minesweeper clone");
 		mvwprintw(opt, rows / 2 + 1, (cols - 36) / 2, "made by Tirth Nagar using the Curses");
 		mvwprintw(opt, rows / 2 + 2, (cols - 40) / 2, "Library the rules are the same as normal");
@@ -328,7 +344,7 @@ int menuSetup(void)
 		wattroff(opt, A_STANDOUT);
 		wrefresh(opt);
 
-		char ch;
+		char ch; // If X is pressed go back to main menu
 		while (ch != 'X' || ch != 'x')
 		{
 			ch = getch();
@@ -342,7 +358,7 @@ int menuSetup(void)
 		}
 	}
 
-	else if (highlight == 3) //Quit
+	else if (highlight == 3) // If Quit option is selected do this
 	{
 		echo();
 		refresh();
@@ -350,6 +366,7 @@ int menuSetup(void)
 		erase();
 		exit(0);
 	}
+
 	return 0;
 }
 
@@ -366,12 +383,12 @@ int playGame()
 	W = gameInfo[1];
 	N = gameInfo[2];
 
-	board_arry = calloc(H * W, sizeof(unsigned char));
+	board_arry = calloc(H * W, sizeof(unsigned char)); // Allocate memory to the arrays
 	tempSize = H * W * 2;
 	temp_arry = calloc(tempSize, sizeof(unsigned char));
 	info = calloc(120, sizeof(char));
 
-	savetty();
+	savetty(); // Save teminal Settings
 
 	initGame(board_arry);
 	REMAIN_N = N;
@@ -379,7 +396,7 @@ int playGame()
 	int physicalW = W * STEP_X + 1;
 	int physicalH = H * STEP_Y + 1;
 
-	board_win = subwin(stdscr, physicalH, physicalW, 8, cols / 2.75);
+	board_win = subwin(stdscr, physicalH, physicalW, 8, cols / 2.75); // Create the board window
 
 	initColorPairs();
 
@@ -388,12 +405,12 @@ int playGame()
 	attroff(A_STANDOUT);
 	wrefresh(board_win);
 
-	printBoard(physicalH, physicalW);
+	printBoard(physicalH, physicalW); // Call and run the printBoard function with necessary
 
 	updateInfo();
 	mvprintw((W * STEP_X + 1) - 6, (cols - 45) / 2, control);
 
-	wmove(board_win, 1, 2);
+	wmove(board_win, 1, 2); // Move cursor to following coordinates in the window
 	X = 0;
 	Y = 0;
 
@@ -402,14 +419,13 @@ int playGame()
 
 	initKeypad();
 
-	delwin(board_win);
+	delwin(board_win); // Clear data in arrays and reset terminal
 	resetty();
 	echo();
 	endwin();
 	free(info);
 	free(board_arry);
 	free(temp_arry);
-	exit(EXIT_SUCCESS);
 }
 
 // Reset the terminal
@@ -800,11 +816,6 @@ bool showSquare(int currY, int currX)
 {
 	int tempIdx = currY * W + currX;
 	unsigned char tempVal = board_arry[tempIdx];
-	if (tempIdx < 0 || tempIdx >= H * W)
-	{
-		// For debug
-		fprintf(stderr, "Invalid read %d, %d\n", currY, currX);
-	}
 
 	if (!(tempVal & SHOW_MASK) && !(tempVal & FLAG_MASK))
 	{
@@ -829,7 +840,7 @@ bool showSquare(int currY, int currX)
 	return false;
 }
 
-// Add mask to cover mines
+// Add character depending on the type of square it is 
 void addChar(int y, int x, chtype c)
 {
 	mvwaddch(board_win, y * STEP_Y + 1, x * STEP_X + 2, c);
@@ -848,7 +859,7 @@ void printInfo()
 	refresh();
 }
 
-// Flag/Mark the locations of the mines  
+// Flag/Mark the locations of the mines
 void flagMine()
 {
 	int tempIdx = Y * W + X;
@@ -966,7 +977,6 @@ void gameOver()
 	GAME_END = false;
 	GAME_END_PRESS = 0;
 	main();
-	
 }
 
 // initialize color pairs
@@ -979,17 +989,11 @@ void initColorPairs()
 		if (start_color() != OK)
 			return;
 		COL_SUPP = true;
-		init_pair(1, COLOR_GREEN, -1);
-		init_pair(2, COLOR_YELLOW, -1);
-		init_pair(3, COLOR_CYAN, -1);
-		init_pair(4, COLOR_MAGENTA, -1);
-		init_pair(5, COLOR_RED, -1);
-		init_pair(6, COLOR_RED, -1);
-		init_pair(7, COLOR_RED, -1);
-		init_pair(8, COLOR_RED, -1);
-		init_pair(9, COLOR_RED, -1);
-		init_pair(10, COLOR_WHITE, -1);
+		init_pair(1, COLOR_GREEN, 0);
+		init_pair(2, COLOR_YELLOW, 0);
+		init_pair(3, COLOR_CYAN, 0);
+		init_pair(4, COLOR_MAGENTA, 0);
+		init_pair(5, COLOR_RED, 0);
+		init_pair(6, COLOR_WHITE, 0);
 	}
 }
-
-// End OF Code
